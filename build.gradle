@@ -1,0 +1,45 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'org.springframework.boot'
+
+group = 'robevansuk'
+version = '0.0.1'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://repo.maven.apache.org/maven2" }
+        maven { url "https://repo.spring.io/release" }
+
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE"
+    }
+}
+
+repositories {
+    maven { url "http://central.maven.org/maven2/"}
+    maven { url "http://repo1.maven.org/maven2/" }
+    maven { url "https://repo.spring.io/release/"}
+
+}
+
+project.archivesBaseName = 'delay-repay-bot'
+project.applicationName = 'delay-repay-bot'
+
+group = 'robevansuk'
+description = 'Client for the National Rail Darwin Live Departure Boards Web Service (LDBWS / OpenLDBWS)'
+
+dependencies {
+    compile 'junit:junit:4.12'
+    compile 'org.springframework.boot:spring-boot-starter-web:1.5.1.RELEASE'
+    compile 'org.springframework:spring-context:4.3.4.RELEASE'
+    compile 'org.apache.cxf:cxf:3.1.10'
+
+    testCompile 'org.springframework:spring-test:4.3.5.RELEASE'
+    testCompile 'org.springframework.boot:spring-boot-test:1.5.1.RELEASE'
+}
+
+tasks.withType(Jar) {
+    destinationDir = file("${rootDir}/build/")
+}
