@@ -1,8 +1,9 @@
 package com.morphiles.delay.repay.api.departures;
 
 import com.morphiles.delay.repay.api.BaseTest;
-import com.morphiles.delay.repay.api.entity.Hold;
+import com.morphiles.delay.repay.api.service.DelayRepayBot;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertTrue;
 
@@ -11,8 +12,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class DeparturesTest extends BaseTest {
 
+    @Autowired
+    DelayRepayBot delayRepayBot;
+
     @Test
-    public void canGetAccounts() {
-       assertTrue(true);
+    public void canGetDeparturesBoard() {
+
+        delayRepayBot.checkTrainDelays();
+        assertTrue(true);
+
     }
 }

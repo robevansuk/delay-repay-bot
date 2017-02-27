@@ -1,6 +1,6 @@
 package com.morphiles.delay.repay.api;
 
-import com.morphiles.delay.repay.api.exchange.DarwinService;
+import com.morphiles.delay.repay.api.service.DelayRepayBot;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,5 +20,5 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public abstract class BaseTest {
 
     @Autowired
-    public DarwinService darwin;
+    public DelayRepayBot delayRepayBot;
 }

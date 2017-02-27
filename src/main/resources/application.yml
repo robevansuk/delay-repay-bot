@@ -1,3 +1,2 @@
 app:
-  baseUrl: "https://lite.realtime.nationalrail.co.uk/OpenLDBWS"
-  token: "yourApiKeyHere - register here: http://www.nationalrail.co.uk/100296.aspx"
+  token: "YourApiKeyHere"
