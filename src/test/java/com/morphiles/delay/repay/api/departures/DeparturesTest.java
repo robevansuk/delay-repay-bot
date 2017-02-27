@@ -22,4 +22,10 @@ public class DeparturesTest extends BaseTest {
         assertTrue(true);
 
     }
+
+    @Test
+    public void getDelayRepayForm() {
+        delayRepayBot.delayRepayForm();
+        assertTrue(true);
+    }
 }

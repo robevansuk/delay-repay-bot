@@ -7,16 +7,15 @@ import com.thalesgroup.rtti._2016_02_16.ldb.Ldb;
 import com.thalesgroup.rtti._2016_02_16.ldb.StationBoardResponseType;
 import com.thalesgroup.rtti._2016_02_16.ldb.types.ServiceItem;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 
@@ -111,5 +110,15 @@ public class DelayRepayBotImpl implements DelayRepayBot {
 
     private int getMinute(String time) {
         return Integer.parseInt(time.split(":")[1]);
+    }
+
+    @Override
+    public void delayRepayForm() {
+        try {
+            Document doc = Jsoup.connect("https://delayrepay.thameslinkrailway.com/customer-details").get();
+            Elements newsHeadlines = doc.select("form#margin-top");
+        } catch (IOException ex) {
+            log.error(ex.getMessage());
+        }
     }
 }

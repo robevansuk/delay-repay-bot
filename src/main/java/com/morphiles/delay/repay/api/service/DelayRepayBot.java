@@ -8,12 +8,9 @@ import java.security.NoSuchAlgorithmException;
  * created by robevansuk 20/2/2017
  */
 public interface DelayRepayBot {
-    /**
-     * @return
-     * @throws IOException
-     * @throws InvalidKeyException
-     * @throws NoSuchAlgorithmException
-     * @throws CloneNotSupportedException
-     */
-    public void checkTrainDelays();
+
+    void checkTrainDelays();
+    void delayRepayForm();
+
+
 }
