@@ -23,27 +23,34 @@ public class DeparturesTest extends BaseTest {
     @Test
     public void checkTrainTimesForMyTrains() {
 
-        long oneHour = 1000 * 60 * 60;
+        long oneHour = (1000 * 60 * 60) - 60000;
         long nextCheckTime = now() + 0;
 
         while(true) {
             try {
                 int i = 0;
+                long minsRemaining = 0;
                 while (now() < nextCheckTime) {
-                    long minsRemaining = (nextCheckTime - now())/ (1000*60);
+                    minsRemaining = (nextCheckTime - now())/ (1000*60);
 
                     log.info(minsRemaining + " mins until next check");
                     Thread.sleep(oneHour / partsOfHour);
                     i++;
                 }
+                log.info("Checking for delays...");
+                log.info("*************************************************");
                 delayRepayBot.checkTrainDelays("RDT", "STP");
+                log.info("*************************************************");
                 delayRepayBot.checkTrainDelays("STP", "RDT");
-                delayRepayBot.checkTrainDelays("SAC", "STP");
-                delayRepayBot.checkTrainDelays("STP", "SAC");
+                log.info("*************************************************");
+                //delayRepayBot.checkTrainDelays("SAC", "STP");
+                //delayRepayBot.checkTrainDelays("STP", "SAC");
                 delayRepayBot.checkDelayedArrivals("RDT", "STP");
+                log.info("*************************************************");
                 delayRepayBot.checkDelayedArrivals("STP", "RDT");
-                delayRepayBot.checkDelayedArrivals("SAC", "STP");
-                delayRepayBot.checkDelayedArrivals("STP", "SAC");
+
+//                delayRepayBot.checkDelayedArrivals("SAC", "STP");
+//                delayRepayBot.checkDelayedArrivals("STP", "SAC");
 
                 nextCheckTime = now() + oneHour;
             } catch (InterruptedException ex) {
