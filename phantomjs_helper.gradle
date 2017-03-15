@@ -1,0 +1,84 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+    dependencies {
+        classpath 'commons-io:commons-io:2.4'
+
+        classpath (group:'com.github.klieber',name:'phantomjs',version:'2.1.1') {
+            artifact {
+                name = 'phantomjs'
+                classifier = 'linux-x86_64'
+                type = 'tar.bz2'
+            }
+        }
+
+        classpath (group:'com.github.klieber',name:'phantomjs',version:'2.1.1') {
+            artifact {
+                name = 'phantomjs'
+                classifier = 'linux-i686'
+                type = 'tar.bz2'
+            }
+        }
+
+        classpath (group:'com.github.klieber',name:'phantomjs',version:'2.1.1') {
+            artifact {
+                name = 'phantomjs'
+                classifier = 'windows'
+                type = 'zip'
+            }
+        }
+
+        classpath (group:'com.github.klieber',name:'phantomjs',version:'2.1.1') {
+            artifact {
+                name = 'phantomjs'
+                classifier = 'macosx'
+                type = 'zip'
+            }
+        }
+    }
+}
+
+project.buildDir = 'build'
+
+ext {
+    phantomJsVersion = '2.1.1'
+}
+
+task copyPhantomJs(type: Copy) {
+    from findPhantomJsBinary()
+    into "$buildDir/resources/test/"
+}
+
+def findPhantomJsBinary() {
+    buildscript.configurations.classpath.files { it.group.equals('com.github.klieber') }
+}
+
+task unzipPhantomJs(type: Copy) {
+    dependsOn copyPhantomJs
+
+    def osFilenamePart
+
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        osFilenamePart = "windows.zip"
+    } else if (Os.isFamily(Os.FAMILY_MAC)) {
+        osFilenamePart = "macosx.zip"
+    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+        osFilenamePart = Os.isArch("amd64") ? "linux-x86_64.tar.bz2" : "linux-i686.tar.bz2"
+    }
+
+    def filename = "phantomjs-$phantomJsVersion-$osFilenamePart"
+    def outputFile = file("$buildDir/resources/test/$filename")
+
+    def outputDir = file("$buildDir/resources/test/phantomjs")
+
+    from(Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_WINDOWS) ? zipTree(outputFile) : tarTree(outputFile))
+    into(outputDir)
+    eachFile { FileCopyDetails fcp ->
+        fcp.relativePath = new RelativePath(!fcp.directory, *fcp.relativePath.segments[1..-1])
+    }
+}

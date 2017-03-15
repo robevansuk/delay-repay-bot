@@ -15,5 +15,7 @@ public interface DelayRepayBot {
      * @throws NoSuchAlgorithmException
      * @throws CloneNotSupportedException
      */
-    public void checkTrainDelays();
+    public void checkTrainDelays(String from, String to);
+
+    public void checkDelayedArrivals(String from, String to);
 }

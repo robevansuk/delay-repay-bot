@@ -2,6 +2,7 @@
 .idea/
 .gradle/
 build/
+classes/
 *.log
 .DS_Store
 *.class
