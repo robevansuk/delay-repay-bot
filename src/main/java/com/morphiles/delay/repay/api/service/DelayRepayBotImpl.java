@@ -41,8 +41,8 @@ public class DelayRepayBotImpl implements DelayRepayBot {
         GetBoardRequestParams reqParams = getGetBoardRequestParams(fromCode, toCode, twoHoursBack);
 
         StationBoardResponseType departures = api.getDepartureBoard(reqParams, token);
-
-        findTrainWithMaxDelay(departures, fromCode, toCode, "Departure");
+        List<ServiceItem> trainTimes = getServiceItems(departures);
+        findMaxDelayOnDep(trainTimes, fromCode, toCode);
 
     }
     @Override
@@ -50,8 +50,9 @@ public class DelayRepayBotImpl implements DelayRepayBot {
         int oneHourAhead = 60;
         GetBoardRequestParams reqParams = getGetBoardRequestParams(fromCode, toCode, oneHourAhead );
 
-        StationBoardResponseType departures = api.getArrivalBoard(reqParams, token);
-        findTrainWithMaxDelay(departures, fromCode, toCode, "Arrival");
+        StationBoardResponseType arrivals = api.getArrivalBoard(reqParams, token);
+        List<ServiceItem> trainTimes = getServiceItems(arrivals);
+        findMaxDelayOnArrival(trainTimes, fromCode, toCode);
     }
 
     private GetBoardRequestParams getGetBoardRequestParams(String fromStationCode, String toStationCode, int timeOffset) {
@@ -63,18 +64,8 @@ public class DelayRepayBotImpl implements DelayRepayBot {
         return reqParams;
     }
 
-    public ServiceItem findTrainWithMaxDelay(StationBoardResponseType departures,
-                                             String fromCode,
-                                             String toCode,
-                                             String arrDep) {
-
-        List<ServiceItem> trainTimes = departures.getGetStationBoardResult().getTrainServices().getService();
-        if (arrDep.equals("Arrival")) {
-            return findMaxDelayOnArrival(trainTimes, fromCode, toCode);
-        }
-        return findMaxDelayOnDep(trainTimes, fromCode, toCode);
-
-
+    private List<ServiceItem> getServiceItems(StationBoardResponseType departures) {
+        return departures.getGetStationBoardResult().getTrainServices().getService();
     }
 
     private ServiceItem findMaxDelayOnArrival(List<ServiceItem> trainTimes,
@@ -94,7 +85,7 @@ public class DelayRepayBotImpl implements DelayRepayBot {
             if (!item.getEta().equals("On time")){
                 reason = item.getEta();
                 // train due - train actually arrived at. Delay identified
-                log.info("Arrivals: " + item.getSta() + " " + item.getEta());
+//                log.info("Arrivals: " + item.getSta() + " " + item.getEta());
                 time1 = LocalTime.of(getHour(item.getSta()), getMinute(item.getSta()));
 
                 if (item.getEta().equals("Cancelled")) {
@@ -134,17 +125,17 @@ public class DelayRepayBotImpl implements DelayRepayBot {
                     reason = "";
                 }
 
-                log.info("Arrival " + fromCode + "->" + toCode + " " + time1 + " " + reason + (time2!=null ? (" actual: " + time2 + " - " + diffInMinutes + " mins delay") : " (delay not known)"));
+                log.info("Arrivals: " + fromCode + "->" + toCode + " " + time1 + " " + reason + (time2!=null ? (" actual: " + time2 + " - " + diffInMinutes + " mins delay") : " (delay not known)"));
 
                 if (diffInMinutes > maxDelay) {
                     maxDelayedTrain = trainTimes.get(i+1);
                     maxDelay = diffInMinutes;
-                    log.info("MaxDelay Arrival updated to: " + maxDelay);
+                    log.info("Arrivals: MaxDelay updated to: " + maxDelay);
                 }
             }
         }
         if (maxDelayedTrain == null) {
-            log.info(fromCode + "->" + toCode + " No delayed arrivals found.");
+            log.info("Arrivals: " + fromCode + "->" + toCode + " No delays found.");
         }
         return maxDelayedTrain;
     }
@@ -166,7 +157,7 @@ public class DelayRepayBotImpl implements DelayRepayBot {
             if (!item.getEtd().equals("On time")){
                 reason = item.getEtd();
                 // train due - train actually arrived at. Delay identified
-                log.debug(trainTimes.get(i).getStd() + " " + trainTimes.get(i).getEtd());
+                log.debug("Departures: " + trainTimes.get(i).getStd() + " " + trainTimes.get(i).getEtd());
                 time1 = LocalTime.of(getHour(trainTimes.get(i).getStd()), getMinute(trainTimes.get(i).getStd()));
 
                 if (item.getEtd().equals("Cancelled")) {
@@ -192,7 +183,9 @@ public class DelayRepayBotImpl implements DelayRepayBot {
                     }
                 } else {
                     // train just delayed
-                    time2 = LocalTime.of(getHour(trainTimes.get(i).getEtd()), getMinute(trainTimes.get(i).getEtd()));
+                    if (!trainTimes.get(i).getEtd().equals("Delayed")) {
+                        time2 = LocalTime.of(getHour(trainTimes.get(i).getEtd()), getMinute(trainTimes.get(i).getEtd()));
+                    }
                 }
 
                 long diffInMinutes = 0;
@@ -205,17 +198,18 @@ public class DelayRepayBotImpl implements DelayRepayBot {
                     reason = "";
                 }
 
-                log.info("Departure " + fromCode + "->" + toCode + " " + time1 + " " + reason + (time2 != null ? (" actual: " + time2 + " - " + diffInMinutes + " mins delay") : " (delay not known)"));
+                log.info("Departures: " + fromCode + "->" + toCode + " " + time1 + " " + reason + (time2 != null ? (" actual: " + time2 + " - " + diffInMinutes + " mins delay") : " (delay not known)"));
 
                 if (diffInMinutes > maxDelay) {
                     maxDelayedTrain = trainTimes.get(i+1);
                     maxDelay = diffInMinutes;
-                    log.info("MaxDelay Departure updated to: " + maxDelay);
+                    maxDelayedTrain = trainTimes.get(i);
+                    log.info("Departures: MaxDelay updated to: " + maxDelay);
                 }
             }
         }
         if (maxDelayedTrain == null) {
-            log.info(fromCode + "->" + toCode + " No delayed departures found");
+            log.info("Departures: " + fromCode + "->" + toCode + " No delays found");
         }
         return maxDelayedTrain;
     }

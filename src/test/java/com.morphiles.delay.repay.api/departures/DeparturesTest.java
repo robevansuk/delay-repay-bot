@@ -23,7 +23,7 @@ public class DeparturesTest extends BaseTest {
     @Test
     public void checkTrainTimesForMyTrains() {
 
-        long oneHour = (1000 * 60 * 60) - 60000;
+        long oneHour = (1000 * 60 * 60) - 120000;
         long nextCheckTime = now() + 0;
 
         while(true) {
@@ -31,7 +31,7 @@ public class DeparturesTest extends BaseTest {
                 int i = 0;
                 long minsRemaining = 0;
                 while (now() < nextCheckTime) {
-                    minsRemaining = (nextCheckTime - now())/ (1000*60);
+                    minsRemaining = (nextCheckTime - now()) / (1000*60);
 
                     log.info(minsRemaining + " mins until next check");
                     Thread.sleep(oneHour / partsOfHour);
@@ -39,19 +39,23 @@ public class DeparturesTest extends BaseTest {
                 }
                 log.info("Checking for delays...");
                 log.info("*************************************************");
+
                 delayRepayBot.checkTrainDelays("RDT", "STP");
                 log.info("*************************************************");
                 delayRepayBot.checkTrainDelays("STP", "RDT");
                 log.info("*************************************************");
-                //delayRepayBot.checkTrainDelays("SAC", "STP");
-                //delayRepayBot.checkTrainDelays("STP", "SAC");
+                delayRepayBot.checkTrainDelays("SAC", "STP");
+                log.info("*************************************************");
+                delayRepayBot.checkTrainDelays("STP", "SAC");
+                log.info("*************************************************");
                 delayRepayBot.checkDelayedArrivals("RDT", "STP");
                 log.info("*************************************************");
                 delayRepayBot.checkDelayedArrivals("STP", "RDT");
-
-//                delayRepayBot.checkDelayedArrivals("SAC", "STP");
-//                delayRepayBot.checkDelayedArrivals("STP", "SAC");
-
+                log.info("*************************************************");
+                delayRepayBot.checkDelayedArrivals("SAC", "STP");
+                log.info("*************************************************");
+                delayRepayBot.checkDelayedArrivals("STP", "SAC");
+                log.info("*************************************************");
                 nextCheckTime = now() + oneHour;
             } catch (InterruptedException ex) {
                 log.info("Delay Repay Bot Stopped");
